@@ -17,6 +17,17 @@ using namespace std;
 
 int V8Context::number = 0;
 
+
+Handle<v8::Value> Wrap(void* value) {
+    return External::New(value);
+}
+      
+void* Unwrap(Handle<v8::Value> obj) {
+    return External::Cast(*obj)->Value();
+}
+                              
+                              
+
 void set_perl_error(const TryCatch& try_catch) {
     Handle<Message> msg = try_catch.Message();
 
@@ -235,7 +246,7 @@ public:
                   context_->make_function->Call(
                       context_->context->Global(),
                       1,
-                      &External::Wrap(this)
+                      &Wrap(this)
                   )
               ),
               cv
@@ -244,7 +255,7 @@ public:
     { }
 
     static Handle<Value> v8invoke(const Arguments& args) {
-        PerlFunctionData* data = static_cast<PerlFunctionData*>(External::Unwrap(args[0]));
+        PerlFunctionData* data = static_cast<PerlFunctionData*>(Unwrap(args[0]));
         return data->invoke(args);
     }
 };
@@ -333,7 +344,7 @@ V8Context::V8Context(
 
 void V8Context::register_object(ObjectData* data) {
     seen_perl[data->ptr] = data;
-    data->object->SetHiddenValue(string_wrap, External::Wrap(data));
+    data->object->SetHiddenValue(string_wrap, Wrap(data));
 }
 
 void V8Context::remove_object(ObjectData* data) {
@@ -489,7 +500,7 @@ SV* V8Context::seen_v8(Handle<Object> object) {
     if (wrap.IsEmpty())
         return NULL;
 
-    ObjectData* data = (ObjectData*)External::Unwrap(wrap);
+    ObjectData* data = (ObjectData*)Unwrap(wrap);
     return newRV(data->sv);
 }
 
