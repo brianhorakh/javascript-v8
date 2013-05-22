@@ -18,14 +18,7 @@ using namespace std;
 int V8Context::number = 0;
 
 
-Handle<v8::Value> Wrap(void* value) {
-    return External::New(value);
-}
-      
-void* Unwrap(Handle<v8::Value> obj) {
-    return External::Cast(*obj)->Value();
-}
-                              
+
                               
 
 void set_perl_error(const TryCatch& try_catch) {
@@ -61,6 +54,17 @@ check_perl_error() {
 
     return Handle<Value>();
 }
+
+
+Handle<v8::Value> Wrap(void* value) {
+    return External::New(value);
+}
+      
+void* Unwrap(Handle<v8::Value> obj) {
+    return External::Cast(*obj)->Value();
+}
+                              
+
 
 // Internally-used wrapper around coderefs
 static IV
@@ -894,3 +898,5 @@ void
 V8Context::set_flags_from_string(char *str) {
     V8::SetFlagsFromString(str, strlen(str));
 }
+
+
